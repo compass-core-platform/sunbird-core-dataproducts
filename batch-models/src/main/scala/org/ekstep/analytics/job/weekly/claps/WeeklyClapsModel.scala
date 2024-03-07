@@ -66,7 +66,7 @@ object WeeklyClapsModel extends IBatchModelTemplate[String, DummyInput, DummyOut
       lit("numberOfSessions"), when(col("sessionCount").isNull, 0).otherwise(col("sessionCount"))
     ))
 
-    val condition = col("w4")("timespent") >= 60.0 && !col("claps_updated_this_week")
+    val condition = col("w4")("timespent") >= 10.0 && !col("claps_updated_this_week")
 
     if(dataTillDate.equals(weekEnd) && !dataTillDate.equals(df.select(col("last_updated_on")))) {
       JobLogger.log("Started weekend updates")
@@ -81,7 +81,7 @@ object WeeklyClapsModel extends IBatchModelTemplate[String, DummyInput, DummyOut
         col("sessionCount"),
         col("claps_updated_this_week")
       )
-      df = df.withColumn("total_claps", when(col("w4")("timespent") < 60.0, 0).otherwise(col("total_claps")))
+      df = df.withColumn("total_claps", when(col("w4")("timespent") < 10.0, 0).otherwise(col("total_claps")))
         .withColumn("total_claps", when(condition, col("total_claps") + 1).otherwise(col("total_claps")))
         .withColumn("last_updated_on", lit(dataTillDate))
         .withColumn("claps_updated_this_week", lit(false))
